@@ -1,39 +1,33 @@
-Smart Skin Tracker
-Your Personal AI-Powered Dermatology Assistant
+# Smart Skin Tracker
+## AI-Powered Dermatology Assistant Using Python & OpenCV
 
-Smart Skin Tracker is a computer-vision–powered application that helps you monitor your skin health daily using your webcam or uploaded photos. Whether you're tracking acne, hyperpigmentation, whiteheads, redness, or overall complexion, this tool gives you data-driven insights and visual progress graphs — just like having your own dermatologist assistant.
+Smart Skin Tracker is an AI-driven computer vision app that analyzes your face daily to help you monitor and improve your skin health. It detects acne, highlights whiteheads, measures redness, tracks hyperpigmentation, and visualizes your progress in a clean dashboard.
 
-This project combines Python, OpenCV, and an interactive dashboard to deliver smart skin analytics in real time.
+# Features
+## Facial Analysis
 
-#Features
-Daily Facial Scans
+Daily facial scan (webcam or upload)
 
-Automatically capture or upload an image of your face for analysis.
+Acne detection
 
-Acne & Whitehead Detection
+Whitehead/blackhead detection
 
-Detect pimples, whiteheads, blackheads, and track how they change over time.
+Hyperpigmentation tracking
 
-Hyperpigmentation Tracking
+Redness measurement
 
-Measure discoloration, dark spots, and patches with pixel-level analysis.
+## Progress Tracking
 
-Redness Analysis
+Trend graphs
 
-Identify irritation, inflammation, or rosacea-like redness.
+Skin improvement timeline
 
-Progress Graphs
+Daily scan comparisons
 
-See improvements or problem areas visualized clearly in your dashboard.
+## AI Routine Suggestions
 
-Routine Suggestions
+Adjust exfoliation frequency
 
-Optional AI-based recommendations:
+Identify irritation triggers
 
-Reduce irritation
-
-Change exfoliation frequency
-
-Add/Remove specific products
-
-Adjust your AM/PM routine
+Recommend product changes
