@@ -81,6 +81,6 @@ Compares daily scans to previous results.
 Generates graphs + overlays in the dashboard.
 
 # Author
-Innocent Ngoy
+Innocent Ngoy /br
 Full-Stack Developer | Creative Director
 GitHub: https://github.com/Inongoy
