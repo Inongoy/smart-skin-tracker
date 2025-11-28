@@ -1,91 +1,262 @@
-import React from "react";
-import { View, Text, StyleSheet, ScrollView, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { IconSymbol } from "@/components/IconSymbol";
-import { GlassView } from "expo-glass-effect";
-import { useTheme } from "@react-navigation/native";
+
+import React from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import { colors } from '@/styles/commonStyles';
+import { useSkinData } from '@/hooks/useSkinData';
+import { ProgressChart } from '@/components/ProgressChart';
+import { ScanCard } from '@/components/ScanCard';
+import { IconSymbol } from '@/components/IconSymbol';
 
 export default function ProfileScreen() {
-  const theme = useTheme();
+  const { scans, getMetricHistory, deleteScan } = useSkinData();
+
+  const acneHistory = getMetricHistory('acne');
+  const whiteheadHistory = getMetricHistory('whitehead');
+  const hyperpigmentationHistory = getMetricHistory('hyperpigmentation');
+  const rednessHistory = getMetricHistory('redness');
+
+  const handleDeleteScan = (scanId: string) => {
+    Alert.alert(
+      'Delete Scan',
+      'Are you sure you want to delete this scan? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => deleteScan(scanId),
+        },
+      ]
+    );
+  };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: theme.colors.background }]} edges={['top']}>
+    <View style={styles.container}>
       <ScrollView
-        style={styles.container}
-        contentContainerStyle={[
-          styles.contentContainer,
-          Platform.OS !== 'ios' && styles.contentContainerWithTabBar
-        ]}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
       >
-        <GlassView style={[
-          styles.profileHeader,
-          Platform.OS !== 'ios' && { backgroundColor: theme.dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }
-        ]} glassEffectStyle="regular">
-          <IconSymbol ios_icon_name="person.circle.fill" android_material_icon_name="person" size={80} color={theme.colors.primary} />
-          <Text style={[styles.name, { color: theme.colors.text }]}>John Doe</Text>
-          <Text style={[styles.email, { color: theme.dark ? '#98989D' : '#666' }]}>john.doe@example.com</Text>
-        </GlassView>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Progress & History</Text>
+          <Text style={styles.headerSubtitle}>
+            Track your skin health over time
+          </Text>
+        </View>
 
-        <GlassView style={[
-          styles.section,
-          Platform.OS !== 'ios' && { backgroundColor: theme.dark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)' }
-        ]} glassEffectStyle="regular">
-          <View style={styles.infoRow}>
-            <IconSymbol ios_icon_name="phone.fill" android_material_icon_name="phone" size={20} color={theme.dark ? '#98989D' : '#666'} />
-            <Text style={[styles.infoText, { color: theme.colors.text }]}>+1 (555) 123-4567</Text>
+        {scans.length === 0 ? (
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIconContainer}>
+              <IconSymbol
+                ios_icon_name="chart.bar"
+                android_material_icon_name="bar-chart"
+                size={64}
+                color={colors.accent}
+              />
+            </View>
+            <Text style={styles.emptyTitle}>No Data Yet</Text>
+            <Text style={styles.emptyText}>
+              Take your first scan to start tracking your progress!
+            </Text>
           </View>
-          <View style={styles.infoRow}>
-            <IconSymbol ios_icon_name="location.fill" android_material_icon_name="location-on" size={20} color={theme.dark ? '#98989D' : '#666'} />
-            <Text style={[styles.infoText, { color: theme.colors.text }]}>San Francisco, CA</Text>
-          </View>
-        </GlassView>
+        ) : (
+          <>
+            {/* Progress Charts */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Progress Charts</Text>
+              <ProgressChart
+                title="Acne Count"
+                data={acneHistory}
+                color={colors.error}
+                isCount={true}
+              />
+              <ProgressChart
+                title="Whitehead Count"
+                data={whiteheadHistory}
+                color={colors.warning}
+                isCount={true}
+              />
+              <ProgressChart
+                title="Hyperpigmentation Level"
+                data={hyperpigmentationHistory}
+                color={colors.accent}
+              />
+              <ProgressChart
+                title="Redness Level"
+                data={rednessHistory}
+                color={colors.highlight}
+              />
+            </View>
+
+            {/* Scan History */}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Scan History</Text>
+              {scans.map((scan) => (
+                <View key={scan.id} style={styles.scanCardContainer}>
+                  <ScanCard scan={scan} />
+                  <TouchableOpacity
+                    style={styles.deleteButton}
+                    onPress={() => handleDeleteScan(scan.id)}
+                  >
+                    <IconSymbol
+                      ios_icon_name="trash"
+                      android_material_icon_name="delete"
+                      size={20}
+                      color={colors.error}
+                    />
+                    <Text style={styles.deleteButtonText}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              ))}
+            </View>
+
+            {/* Stats Summary */}
+            <View style={styles.statsCard}>
+              <Text style={styles.statsTitle}>Summary</Text>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Total Scans:</Text>
+                <Text style={styles.statValue}>{scans.length}</Text>
+              </View>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>First Scan:</Text>
+                <Text style={styles.statValue}>
+                  {scans[scans.length - 1]?.date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </Text>
+              </View>
+              <View style={styles.statRow}>
+                <Text style={styles.statLabel}>Latest Scan:</Text>
+                <Text style={styles.statValue}>
+                  {scans[0]?.date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric',
+                  })}
+                </Text>
+              </View>
+            </View>
+          </>
+        )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    // backgroundColor handled dynamically
-  },
   container: {
     flex: 1,
+    backgroundColor: colors.background,
   },
-  contentContainer: {
-    padding: 20,
+  scrollView: {
+    flex: 1,
   },
-  contentContainerWithTabBar: {
-    paddingBottom: 100, // Extra padding for floating tab bar
+  scrollContent: {
+    paddingTop: 48,
+    paddingHorizontal: 20,
+    paddingBottom: 120,
   },
-  profileHeader: {
-    alignItems: 'center',
-    borderRadius: 12,
-    padding: 32,
-    marginBottom: 16,
-    gap: 12,
+  header: {
+    marginBottom: 24,
   },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    // color handled dynamically
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: colors.text,
+    marginBottom: 4,
   },
-  email: {
+  headerSubtitle: {
     fontSize: 16,
-    // color handled dynamically
+    color: colors.textSecondary,
   },
   section: {
-    borderRadius: 12,
-    padding: 20,
-    gap: 12,
+    marginBottom: 32,
   },
-  infoRow: {
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 16,
+  },
+  scanCardContainer: {
+    marginBottom: 16,
+  },
+  deleteButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    justifyContent: 'center',
+    backgroundColor: colors.card,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
+    marginTop: -8,
+    borderWidth: 1,
+    borderColor: colors.error,
   },
-  infoText: {
+  deleteButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.error,
+  },
+  statsCard: {
+    backgroundColor: colors.card,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
+    elevation: 3,
+  },
+  statsTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 16,
+  },
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  statLabel: {
     fontSize: 16,
-    // color handled dynamically
+    color: colors.textSecondary,
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyIconContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+  },
+  emptyTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: colors.text,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  emptyText: {
+    fontSize: 16,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+    paddingHorizontal: 20,
   },
 });

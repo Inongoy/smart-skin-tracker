@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Stack } from 'expo-router';
 import FloatingTabBar, { TabBarItem } from '@/components/FloatingTabBar';
@@ -14,8 +15,8 @@ export default function TabLayout() {
     {
       name: 'profile',
       route: '/(tabs)/profile',
-      icon: 'person',
-      label: 'Profile',
+      icon: 'bar-chart',
+      label: 'Progress',
     },
   ];
 
